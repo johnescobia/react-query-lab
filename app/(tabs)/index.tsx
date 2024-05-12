@@ -1,9 +1,10 @@
 import React from 'react';
 import { FlatList, RefreshControl, StyleSheet } from 'react-native';
-import { Text, View } from '@/components/Themed';
 import { useQuery } from '@tanstack/react-query';
-import API from '@/services/api';
+import { Text, View } from '@/components/Themed';
 import LoadingPost from '@/components/LoadingPost';
+
+import API from '@/services/api';
 
 interface Post {
   body: string;
@@ -54,28 +55,30 @@ export default function Screen(): React.ReactNode {
   }
 
   return (
-    <FlatList
-      data={posts}
-      keyExtractor={(item: Post) => item.id.toString()}
-      renderItem={({ item }) => (
-        <View style={styles.postContainer}>
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.body}>{item.body}</Text>
-        </View>
-      )}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={['#c0c0c0', '#d3d3d3', '#e6e6e6']}
-          tintColor="#e6e6e6"
-          progressBackgroundColor="#f0f0f0"
-        />
+    <View style={styles.list}>
+      <FlatList
+        data={posts}
+        keyExtractor={(item: Post) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.postContainer}>
+            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.body}>{item.body}</Text>
+          </View>
+        )}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#c0c0c0', '#d3d3d3', '#e6e6e6']}
+            tintColor="#e6e6e6"
+            progressBackgroundColor="#f0f0f0"
+          />
 
-      }
-      style={styles.list}
-      contentContainerStyle={styles.contentContainer}
-    />
+        }
+        style={styles.list}
+        contentContainerStyle={styles.contentContainer}
+      />
+    </View>
   );
 }
 
