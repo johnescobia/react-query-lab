@@ -5,18 +5,12 @@ import { Text, View } from '@/components/Themed';
 import LoadingPost from '@/components/LoadingPost';
 
 import API from '@/services/api';
-
-interface Post {
-  body: string;
-  id: number;
-  title: string;
-  userId: number;
-}
+import { Post } from '@/types';
 
 const wait = (timeout: number) => new Promise(resolve => setTimeout(resolve, timeout));
 
 export default function Screen(): React.ReactNode {
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshing, setRefreshing] = React.useState<boolean>(false);
 
   const { data: posts, isLoading, isFetching, refetch } = useQuery<Post[], Error>({
     queryKey: ['posts'],
@@ -27,20 +21,19 @@ export default function Screen(): React.ReactNode {
           ...post,
           body: post.body.replace(/\n/g, '') // Strip newlines right after fetching
         }));
-      } catch (error: any) {
-        console.error(error);
-        throw new Error(error);
-      } finally {
-        await wait(2000); // Simulate a 2 second delay
-        setRefreshing(false);
+      } catch (error: unknown) {
+        console.log(error);
+        throw new Error('There was an error while fetching the posts. Please try again.');
       }
     }
   });
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-    refetch();
-  }, [refetch]);
+    await refetch();
+    await wait(2000);  // Simulate delay
+    setRefreshing(false);
+  }, []);
 
   if (isLoading || isFetching) {
     return (
@@ -73,7 +66,6 @@ export default function Screen(): React.ReactNode {
             tintColor="#e6e6e6"
             progressBackgroundColor="#f0f0f0"
           />
-
         }
         style={styles.list}
         contentContainerStyle={styles.contentContainer}

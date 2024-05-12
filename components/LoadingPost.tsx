@@ -3,10 +3,7 @@ import { StyleSheet } from 'react-native';
 import { View } from './Themed';
 import { MotiView } from 'moti';
 import { Skeleton } from 'moti/skeleton';
-
-type SpacerProps = {
-  height: number;
-};
+import { SpacerProps } from '@/types';
 
 const Spacer = React.memo(({ height }: SpacerProps) => <View style={{ height: height }} />);
 

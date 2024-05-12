@@ -9,7 +9,7 @@ const HTTP_CLIENT = axios.create({
 });
 
 // Add a request interceptor
-HTTP_CLIENT.interceptors.request.use(function (config: InternalAxiosRequestConfig<any>): InternalAxiosRequestConfig<any> | Promise<InternalAxiosRequestConfig<any>> {
+HTTP_CLIENT.interceptors.request.use((config: InternalAxiosRequestConfig<unknown>): InternalAxiosRequestConfig<unknown> | Promise<InternalAxiosRequestConfig<unknown>> => {
   // Do something before request is sent
   return config;
 }, function (error: AxiosError): Promise<AxiosError> {
@@ -18,7 +18,7 @@ HTTP_CLIENT.interceptors.request.use(function (config: InternalAxiosRequestConfi
 });
 
 // Add a response interceptor
-HTTP_CLIENT.interceptors.response.use(function (response: AxiosResponse): AxiosResponse {
+HTTP_CLIENT.interceptors.response.use((response: AxiosResponse): AxiosResponse => {
   // Any status code that lie within the range of 2xx cause this function to trigger
   // Do something with response data
   return response;

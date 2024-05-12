@@ -4,7 +4,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { Mutation, MutationCache, Query, QueryCache, QueryClient, QueryClientProvider, QueryKey } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { useColorScheme } from '@/components/useColorScheme';
 
