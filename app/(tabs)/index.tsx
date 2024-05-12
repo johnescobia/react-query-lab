@@ -1,9 +1,9 @@
 import React from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useQuery } from '@tanstack/react-query';
-import LoadingPost from '@/components/LoadingPost';
 import API from '@/services/api';
+import LoadingPost from '@/components/LoadingPost';
 
 interface Post {
   body: string;
@@ -12,22 +12,34 @@ interface Post {
   userId: number;
 }
 
+const wait = (timeout: number) => new Promise(resolve => setTimeout(resolve, timeout));
+
 export default function Screen(): React.ReactNode {
-  const { data: posts, isLoading, isFetching } = useQuery<Post[], Error>({
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const { data: posts, isLoading, isFetching, refetch } = useQuery<Post[], Error>({
     queryKey: ['posts'],
     queryFn: async (): Promise<Post[]> => {
       try {
         const response = await API.getPost();
-        return response.data.map((post: any) => ({
+        return response.data.map((post: Post) => ({
           ...post,
-          body: post.body.replace(/\n/g, '')  // Strip newlines right after fetching
+          body: post.body.replace(/\n/g, '') // Strip newlines right after fetching
         }));
       } catch (error: any) {
         console.error(error);
         throw new Error(error);
+      } finally {
+        await wait(2000); // Simulate a 2 second delay
+        setRefreshing(false);
       }
     }
   });
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    refetch();
+  }, [refetch]);
 
   if (isLoading || isFetching) {
     return (
@@ -47,10 +59,20 @@ export default function Screen(): React.ReactNode {
       keyExtractor={(item: Post) => item.id.toString()}
       renderItem={({ item }) => (
         <View style={styles.postContainer}>
-          <Text numberOfLines={1} style={styles.title}>{item.title}</Text>
-          <Text numberOfLines={4} style={styles.body}>{item.body}</Text>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.body}>{item.body}</Text>
         </View>
       )}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['#c0c0c0', '#d3d3d3', '#e6e6e6']}
+          tintColor="#e6e6e6"
+          progressBackgroundColor="#f0f0f0"
+        />
+
+      }
       style={styles.list}
       contentContainerStyle={styles.contentContainer}
     />
@@ -64,31 +86,22 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-    justifyContent: 'center',
-    padding: 20
+    padding: 20,
+    backgroundColor: '#f9f9f9'
   },
   postContainer: {
     padding: 20,
-    marginBottom: 15,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: '#ddd'
+    marginBottom: 10,
+    backgroundColor: '#fff',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#ccc',
+    borderRadius: 10,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#333',
-    textTransform: 'capitalize'
   },
   body: {
     fontSize: 14,
-    color: '#666'
-  }
+  },
 });
