@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, RefreshControl, StyleSheet } from 'react-native';
+import { FlatList, Pressable, RefreshControl, StyleSheet } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { Text, View } from '@/components/Themed';
 import LoadingPost from '@/components/LoadingPost';
@@ -31,9 +31,17 @@ export default function Screen(): React.ReactNode {
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     await refetch();
-    await wait(2000);  // Simulate delay
+  }, []);
+
+  const simulateDelay = React.useCallback(async () => {
+    await wait(2000); // Simulate a 2 second delay
     setRefreshing(false);
   }, []);
+
+  React.useEffect(() => {
+    if (!refreshing) return;
+    simulateDelay();
+  }, [refreshing]);
 
   if (isLoading || isFetching) {
     return (
@@ -53,10 +61,12 @@ export default function Screen(): React.ReactNode {
         data={posts}
         keyExtractor={(item: Post) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.postContainer}>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.body}>{item.body}</Text>
-          </View>
+          <Pressable style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1.0 }]}>
+            <View style={styles.postContainer}>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.body}>{item.body}</Text>
+            </View>
+          </Pressable>
         )}
         refreshControl={
           <RefreshControl
