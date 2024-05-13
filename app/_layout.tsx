@@ -1,4 +1,5 @@
 import React from 'react';
+import { AppState, Platform, AppStateStatus } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -6,7 +7,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo'
-import { onlineManager } from '@tanstack/react-query'
+import { onlineManager, focusManager } from '@tanstack/react-query'
 
 import { useColorScheme } from '@/components/useColorScheme';
 
@@ -41,11 +42,24 @@ const queryClient = new QueryClient({
   },
 });
 
+// Refetch on App focus
+const onAppStateChange = (status: AppStateStatus) => {
+  if (Platform.OS !== 'web') {
+    focusManager.setFocused(status === 'active')
+  }
+}
+
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
+
+  React.useEffect(() => {
+    const subscription = AppState.addEventListener('change', onAppStateChange)
+
+    return () => subscription.remove()
+  }, [])
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   React.useEffect(() => {
