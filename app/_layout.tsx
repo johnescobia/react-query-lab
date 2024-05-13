@@ -5,8 +5,17 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import NetInfo, { NetInfoState } from '@react-native-community/netinfo'
+import { onlineManager } from '@tanstack/react-query'
 
 import { useColorScheme } from '@/components/useColorScheme';
+
+// Set up the online status manager to use the NetInfo API.
+onlineManager.setEventListener((setOnline) => {
+  return NetInfo.addEventListener((state: NetInfoState) => {
+    setOnline(!!state.isConnected)
+  })
+})
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -21,6 +30,7 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+// Create a new QueryClient instance.
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
