@@ -10,7 +10,7 @@ import { Post } from '@/types';
 
 const wait = (timeout: number) => new Promise(resolve => setTimeout(resolve, timeout));
 
-const renderItemComponent: ListRenderItem<Post> = ({ item }) => <ItemPost item={item} />;
+const renderItemPost: ListRenderItem<Post> = ({ item }) => <ItemPost item={item} />;
 const renderLoadingPost: ListRenderItem<unknown> = () => <LoadingPost />;
 
 export default function Screen(): React.ReactNode {
@@ -64,7 +64,7 @@ export default function Screen(): React.ReactNode {
       <FlatList
         data={posts}
         keyExtractor={(item: Post) => item.id.toString()}
-        renderItem={renderItemComponent}
+        renderItem={renderItemPost}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
