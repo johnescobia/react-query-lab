@@ -1,13 +1,17 @@
 import React from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet } from 'react-native';
+import { FlatList, ListRenderItem, RefreshControl, StyleSheet } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
-import { Text, View } from '@/components/Themed';
+import { View } from '@/components/Themed';
 import LoadingPost from '@/components/LoadingPost';
+import ItemPost from '@/components/ItemPost';
 
 import API from '@/services/api';
 import { Post } from '@/types';
 
 const wait = (timeout: number) => new Promise(resolve => setTimeout(resolve, timeout));
+
+const renderItemComponent: ListRenderItem<Post> = ({ item }) => <ItemPost item={item} />;
+const renderLoadingPost: ListRenderItem<unknown> = () => <LoadingPost />;
 
 export default function Screen(): React.ReactNode {
   const [refreshing, setRefreshing] = React.useState<boolean>(false);
@@ -48,7 +52,7 @@ export default function Screen(): React.ReactNode {
       <FlatList
         data={new Array(10).fill(0)}
         keyExtractor={(_, index) => index.toString()}
-        renderItem={LoadingPost}
+        renderItem={renderLoadingPost}
         style={styles.list}
         contentContainerStyle={styles.contentContainer}
       />
@@ -60,14 +64,7 @@ export default function Screen(): React.ReactNode {
       <FlatList
         data={posts}
         keyExtractor={(item: Post) => item.id.toString()}
-        renderItem={({ item }) => (
-          <Pressable style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1.0 }]}>
-            <View style={styles.postContainer}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.body}>{item.body}</Text>
-            </View>
-          </Pressable>
-        )}
+        renderItem={renderItemComponent}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -93,20 +90,5 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
     backgroundColor: '#f9f9f9'
-  },
-  postContainer: {
-    padding: 20,
-    marginBottom: 10,
-    backgroundColor: '#fff',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#ccc',
-    borderRadius: 10,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  body: {
-    fontSize: 14,
   },
 });
