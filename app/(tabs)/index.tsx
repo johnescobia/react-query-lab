@@ -21,7 +21,7 @@ export default function Screen(): React.ReactNode {
     queryFn: async () => await API.getPost().then(res => res),
   });
 
-  const { data: dummyError } = useQuery<unknown, Error>({
+  const { } = useQuery<unknown, Error>({
     queryKey: ['dummyError'],
     queryFn: async () => await API.getDummyError().then(res => res),
   });

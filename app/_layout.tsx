@@ -43,8 +43,14 @@ const queryClient = new QueryClient({
   },
   queryCache: new QueryCache({
     onError(error, query) {
-      console.error('An error occurred while fetching the query:', query, error);
-      Toast.show({ type: 'error', text1: error.message });
+      switch (query.queryKey[0]) {
+        case 'dummyError':
+          Toast.show({ type: 'error', text1: error.message });
+          break;
+        default:
+          Toast.show({ type: 'error', text1: 'An error occurred' });
+          break;
+      }
     },
   }),
 });
