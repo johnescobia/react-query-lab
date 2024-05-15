@@ -19,6 +19,7 @@ yarn start
 
 ## 📦 Dependencies
 This project relies on the following major dependencies:
-* [Node.js](https://nodejs.org/en): v20.13.1
+* [Node.js](https://nodejs.org/en/): v20.13.1
 * [Yarn](https://yarnpkg.com/): 1.22.22
 * [Expo Router](https://docs.expo.dev/router/installation/): 3.4.10
+* [React Query](https://tanstack.com/query/latest/docs/framework/react/overview): 5.35.5
