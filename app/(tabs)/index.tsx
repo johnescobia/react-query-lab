@@ -10,7 +10,7 @@ import { Post } from '@/types';
 
 const wait = (timeout: number) => new Promise(resolve => setTimeout(resolve, timeout));
 
-const renderItemPost: ListRenderItem<Post> = ({ item }) => <ItemPost item={item} />;
+const renderItemPost: ListRenderItem<Post> = ({ item }: { item: Post }) => <ItemPost item={item} />;
 const renderLoadingPost: ListRenderItem<unknown> = () => <LoadingPost />;
 
 export default function Screen(): React.ReactNode {
@@ -18,18 +18,12 @@ export default function Screen(): React.ReactNode {
 
   const { data: posts, isLoading, isFetching, refetch } = useQuery<Post[], Error>({
     queryKey: ['posts'],
-    queryFn: async (): Promise<Post[]> => {
-      try {
-        const response = await API.getPost();
-        return response.data.map((post: Post) => ({
-          ...post,
-          body: post.body.replace(/\n/g, '') // Strip newlines right after fetching
-        }));
-      } catch (error: unknown) {
-        console.log(error);
-        throw new Error('There was an error while fetching the posts. Please try again.');
-      }
-    }
+    queryFn: async () => await API.getPost().then(res => res),
+  });
+
+  const { data: dummyError } = useQuery<unknown, Error>({
+    queryKey: ['dummyError'],
+    queryFn: async () => await API.getDummyError().then(res => res),
   });
 
   const onRefresh = React.useCallback(async () => {
